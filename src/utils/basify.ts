@@ -2,8 +2,8 @@ const printable =
   '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c'
 
 /**
- *
- * @param {number} n -
+ * Converts an integer to its pixel (rgb) representation
+ * @param {number} n The number to convert to pixels
  * @returns {number[]}
  */
 const pixel = (n: number): number[] => {
@@ -14,6 +14,11 @@ const pixel = (n: number): number[] => {
   return [r % 256, g % 256, b % 256]
 }
 
+/**
+ * Converts an integer to its alpha pixel (rgba) representation
+ * @param {number} n The number to convert to pixels
+ * @returns {number[]}
+ */
 const alpha_pixel = (n: number): number[] => {
   const a = n
   const b = Math.floor(a / 256)
@@ -26,14 +31,12 @@ const alpha_pixel = (n: number): number[] => {
 const pixelise = (digits: number[]) => digits.map(pixel)
 const strify = (numarr: number[]) => numarr.join('')
 
-const isiterable = (sequence: Array<any>): boolean => {
-  try {
-    for (let i of sequence);
-    return true
-  } catch (e) {
-    return false
-  }
-}
+/**
+ * Checks a sequance for being iterable or not
+ * @param {any[]} sequence The object to check for iterablility
+ * @returns {boolean} True if it's iterable else false
+ */
+const isiterable = (sequence: Array<any>): boolean => Symbol.iterator in (sequence)
 
 const tobase = (n: number, base: number = 3) => {
   console.assert(base <= 10, 'Not yet developed for higher bases')
