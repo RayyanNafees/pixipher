@@ -13,32 +13,39 @@ import Layout from '../layouts/Layout.astro'
     <i class='material-icons'>upload</i>
     Button
   </button>
+  <section></section>
 
-  <div class='b-black b-dashed m10 p10 pt-0 text-wrap'>
-    <h4>Base 64</h4>
-    <div id='b64'></div>
+  <div id='img' class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Image (<span></span>)</h4>
+    <img />
   </div>
-  <div class='b-black b-dashed m10 p10 pt-0'>
-    <h4>Binary Sqtring</h4>
-    <div id='bin'></div>
+  <div id='b64' class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Base 64 (<span></span>)</h4>
+    <div class='break-anywhere'></div>
   </div>
-  <div class='b-black b-dashed m10 p10 pt-0'>
-    <h4>Text</h4>
-    <div id='text'></div>
+  <div id='bin' class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Binary Sqtring (<span></span>)</h4>
+    <div></div>
   </div>
-  <div class='b-black b-dashed m10 p10 pt-0'>
-    <h4>Array Buffer</h4>
-    <div id='buff'></div>
+  <div id='text' class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Text (<span></span>)</h4>
+    <div></div>
+  </div>
+  <div id='buff' class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Array Buffer (<span></span>)</h4>
+    <div class='break-anywhere'></div>
   </div>
 </Layout>
 <script>
-  const Q = <T extends HTMLElement>(q: string) => document.querySelector<T>(q)!
   import {
     toDataURL,
     toText,
     toArrayBuffer,
     toBinaryString,
     output,
+    Data,
+    toImg,
+    Q,
   } from '../utils/fileread'
 
   const input = document.createElement('input')
@@ -47,28 +54,22 @@ import Layout from '../layouts/Layout.astro'
   const upload = Q<HTMLElement>('#upload')
   upload.onclick = () => input.click()
 
-  const b64 = Q('#b64'),
-    bin = Q('#bin'),
-    text = Q('#text'),
-    buff = Q('#buff')
-
   input.oninput = (e) => {
     if (!input.files?.length) throw Error('Input some file')
     const file = input.files[0]
     const start = Date.now()
     Promise.all([
-      output(b64, toDataURL(file)),
-      output(bin, toBinaryString(file)),
-      output(text, toText(file)),
+      toImg('img', file),
+      output('b64', toDataURL(file)),
+      output('bin', toBinaryString(file)),
+      output('text', toText(file)),
+
       output(
-        buff,
-        toArrayBuffer(file).then((data) => {
-          console.log(data)
-          return data
-        })
+        'buff',
+        toArrayBuffer(file).then((data: Data) => new Uint8Array(data))
       ),
     ])
-      .then(() => alert(`Took ${Date.now() - start} ms!`))
+      .then(() => (Q('section').innerText = `Took ${Date.now() - start} ms!`))
       .catch((e) => alert('Error! ' + e))
   }
 </script>
