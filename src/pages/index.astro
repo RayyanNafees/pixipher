@@ -1,5 +1,5 @@
 ---
-import Layout from '../layout/Layout.astro'
+import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout>
@@ -7,9 +7,68 @@ import Layout from '../layout/Layout.astro'
   <p>Upload a file to be converted to pixels</p>
 
   <button
+    id='upload'
     class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect'
   >
     <i class='material-icons'>upload</i>
     Button
   </button>
+
+  <div class='b-black b-dashed m10 p10 pt-0 text-wrap'>
+    <h4>Base 64</h4>
+    <div id='b64'></div>
+  </div>
+  <div class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Binary Sqtring</h4>
+    <div id='bin'></div>
+  </div>
+  <div class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Text</h4>
+    <div id='text'></div>
+  </div>
+  <div class='b-black b-dashed m10 p10 pt-0'>
+    <h4>Array Buffer</h4>
+    <div id='buff'></div>
+  </div>
 </Layout>
+<script>
+  const Q = <T extends HTMLElement>(q: string) => document.querySelector<T>(q)!
+  import {
+    toDataURL,
+    toText,
+    toArrayBuffer,
+    toBinaryString,
+    output,
+  } from '../utils/fileread'
+
+  const input = document.createElement('input')
+  input.type = 'file'
+
+  const upload = Q<HTMLElement>('#upload')
+  upload.onclick = () => input.click()
+
+  const b64 = Q('#b64'),
+    bin = Q('#bin'),
+    text = Q('#text'),
+    buff = Q('#buff')
+
+  input.oninput = (e) => {
+    if (!input.files?.length) throw Error('Input some file')
+    const file = input.files[0]
+    const start = Date.now()
+    Promise.all([
+      output(b64, toDataURL(file)),
+      output(bin, toBinaryString(file)),
+      output(text, toText(file)),
+      output(
+        buff,
+        toArrayBuffer(file).then((data) => {
+          console.log(data)
+          return data
+        })
+      ),
+    ])
+      .then(() => alert(`Took ${Date.now() - start} ms!`))
+      .catch((e) => alert('Error! ' + e))
+  }
+</script>
