@@ -1,53 +1,12 @@
-const printable =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c'
-
-/**
- * Converts an integer to its pixel (rgb) representation
- * @param {number} n The number to convert to pixels
- * @returns {number[]}
- */
-const pixel = (n: number): number[] => {
-  const b = n
-  const g = Math.floor(b / 256)
-  const r = Math.floor(g / 256)
-
-  return [r % 256, g % 256, b % 256]
-}
-
-/**
- * Converts an integer to its alpha pixel (rgba) representation
- * @param {number} n The number to convert to pixels
- * @returns {number[]}
- */
-const alpha_pixel = (n: number): number[] => {
-  const a = n
-  const b = Math.floor(a / 256)
-  const g = Math.floor(b / 256)
-  const r = Math.floor(g / 256)
-
-  return [r % 256, g % 256, b % 256, a % 256]
-}
-
-const pixelise = (digits: number[]) => digits.map(pixel)
-const strify = (numarr: number[]) => numarr.join('')
-
-/**
- * Checks a sequance for being iterable or not
- * @param {any[]} sequence The object to check for iterablility
- * @returns {boolean} True if it's iterable else false
- */
-const isiterable = (sequence: Array<any>): boolean => Symbol.iterator in (sequence)
+import { pixel, alpha_pixel, log } from './index'
 
 const tobase = (n: number, base: number = 3) => {
   console.assert(base <= 10, 'Not yet developed for higher bases')
 
-  const _log = (_n: number, _base: number): number =>
-    Math.log(_n) / Math.log(_base)
-
   let pow_dict = new Map<number, number>()
 
   while (n) {
-    let power = Math.floor(_log(n, base))
+    let power = Math.floor(log(n, base))
     let mul = Math.floor(n / Math.pow(base, power))
     pow_dict.set(power, mul)
     n -= Math.imul(Math.pow(base, power), mul)
@@ -60,18 +19,14 @@ const to_printable_base = (
   n: number,
   base: number = 11
 ): Map<number, string> => {
-  const base_chars = printable
-  console.assert(base <= base_chars.length, 'Base out of rangeL ' + base)
-
-  const _log = (_n: number, _base: number): number =>
-    Math.log(_n) / Math.log(_base)
+  console.assert(base <= printable.length, 'Base out of rangeL ' + base)
 
   let pow_dict = new Map<number, string>()
 
   while (n) {
-    let power = Math.floor(_log(n, base))
+    let power = Math.floor(log(n, base))
     let mul = Math.floor(n / Math.pow(base, power))
-    let _mul = base_chars[mul]
+    let _mul = printable[mul]
     pow_dict.set(power, _mul)
     n -= Math.imul(Math.pow(base, power), mul)
   }
@@ -83,20 +38,17 @@ const to_anybase = (
   n: number,
   base: number = 37,
   base_chars: string | null = printable,
-  char_func?: (val: number) => string
+  char_func?: (val: number) => string | number[]
 ): Map<number, string> => {
   if (!char_func && base_chars)
     console.assert(base <= base_chars.length, 'Base out of Range')
 
-  const _log = (_n: number, _base: number): number =>
-    Math.log(_n) / Math.log(_base)
-
   let pow_dict = new Map<number, string>()
 
   while (n) {
-    let power = Math.floor(_log(n, base)) // 4
+    let power = Math.floor(log(n, base)) // 4
     let mul = Math.floor(n / Math.pow(base, power)) // value
-    let mul_repr: string | undefined // MUST NEVER BE UNDEFINED
+    let mul_repr: string | number[] | undefined // MUST NEVER BE UNDEFINED
 
     if (!char_func && base_chars) {
       // digit representation from chars
@@ -119,11 +71,10 @@ const base_ascii = (n: number) =>
 const base_unicode = (n: number) =>
   to_anybase(n, 1114111, null, String.fromCharCode)
 
-const base_pixel = (n: number) =>
-  to_anybase(n, 16777216, null, String.fromCharCode)
+const base_pixel = (n: number) => to_anybase(n, 16777216, null, pixel)
 
 const base_alpha_pixel = (n: number) =>
-  to_anybase(n, 4294967296, null, String.fromCharCode)
+  to_anybase(n, 4294967296, null, alpha_pixel)
 
 const from_anybase = (
   n: number,

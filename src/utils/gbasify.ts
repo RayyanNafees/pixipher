@@ -1,42 +1,4 @@
-const printable =
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ \t\n\r\x0b\x0c'
-
-const _log = (_n: number, _base: number): number =>
-  Math.log(_n) / Math.log(_base)
-
-const assert = (base: number, length: number) =>
-  console.assert(base <= length, `Base out of range (${length})`)
-
-function* range(length: number) {
-  for (let i = 0; i < length; i++) yield i
-}
-
-/**
- * Converts an integer to its pixel (rgb) representation
- * @param {number} n The number to convert to pixels
- * @returns {number[]}
- */
-const pixel = (n: number): number[] => {
-  const b = n
-  const g = Math.floor(b / 256)
-  const r = Math.floor(g / 256)
-
-  return [r % 256, g % 256, b % 256]
-}
-
-/**
- * Converts an integer to its alpha pixel (rgba) representation
- * @param {number} n The number to convert to pixels
- * @returns {numb>er[]}
- */
-const alpha_pixel = (n: number): number[] => {
-  const a = n
-  const b = Math.floor(a / 256)
-  const g = Math.floor(b / 256)
-  const r = Math.floor(g / 256)
-
-  return [r % 256, g % 256, b % 256, a % 256]
-}
+import { pixel, alpha_pixel, log, range, assert } from './index'
 
 function* pixelise(digits: number[]): Generator<number[]> {
   for (const dig of digits) yield pixel(dig)
@@ -61,7 +23,7 @@ function* tobase(n: number, base: number = 3) {
   assert(base, 10)
 
   while (n) {
-    let power = Math.floor(_log(n, base))
+    let power = Math.floor(log(n, base))
     let mul = Math.floor(n / Math.pow(base, power))
     yield [power, mul]
     n -= Math.imul(Math.pow(base, power), mul)
@@ -72,7 +34,7 @@ function* to_printable_base(n: number, base: number = 11) {
   assert(base, printable.length)
 
   while (n) {
-    let power = Math.floor(_log(n, base))
+    let power = Math.floor(log(n, base))
     let mul = Math.floor(n / Math.pow(base, power))
     let _mul = printable[mul]
     yield [power, _mul]
@@ -90,7 +52,7 @@ function* to_anybase(
     console.assert(base <= base_chars.length, 'Base out of Range')
 
   while (n) {
-    let power = Math.floor(_log(n, base)) // 4
+    let power = Math.floor(log(n, base)) // 4
     let mul = Math.floor(n / Math.pow(base, power)) // value
     let mul_repr: string | number[] | undefined // MUST NEVER BE UNDEFINED
 
@@ -124,7 +86,6 @@ const from_anybase = (
   base_chars: string = printable,
   num_func?: (char: string | number) => number
 ): number => {
-
   if (!num_func)
     throw console.assert(
       base <= base_chars.length,
@@ -145,7 +106,7 @@ const from_anybase = (
     for (let _pow = 0; _pow < numlen; _pow++) {
       sum += Math.imul(Math.pow(base, _pow), mul(dig(n, _pow)))
     }
-    return sum;
+    return sum
   }
 
   const strn: string = typeof n === 'number' ? String(n) : n
