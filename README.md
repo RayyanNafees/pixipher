@@ -13,6 +13,7 @@ Pixel Cipher implementation on the web via WebAssembly for data conversion
 - [Base64 conversion](https://stackoverflow.com/questions/6213227/fastest-way-to-convert-a-number-to-radix-64-in-javascript)
 - [Image from TypeArray of RGBA Pixels](https://stackoverflow.com/questions/22823752/creating-image-from-array-in-javascript-and-html5)
 - [ArrayBuffer & Base64 interconversion](https://stackabuse.com/encoding-and-decoding-base64-strings-in-node-js/)
+- [Bitjs: Binary Operations in JS](https://github.com/codedread/bitjs)
 
 ## Base64 & ArrayBuffers
 ```js
